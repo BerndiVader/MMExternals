@@ -34,7 +34,7 @@ implements
 ITargetedEntitySkill {
 	static String str;
 	int period;
-	boolean cancel,breakOnMatch,breakOnFalse,multi;
+	boolean breakOnMatch,breakOnFalse,multi,cancelMatch,cancelFalse,removephrase;
 	String storage;
 	String[]phrases;
 	RangedDouble radius;
@@ -58,6 +58,9 @@ ITargetedEntitySkill {
 		radius=new RangedDouble(mlc.getString("radius","<10"));
 		breakOnMatch=mlc.getBoolean("breakonmatch",true);
 		breakOnFalse=mlc.getBoolean("breakonfalse",false);
+		cancelMatch=mlc.getBoolean("cancelmatch",false);
+		cancelFalse=mlc.getBoolean("cancelfalse",false);
+		removephrase=mlc.getBoolean("removephrase",false);
 		multi=mlc.getBoolean("multi",false);
 		storage=mlc.getString("meta",null);
 		this.buffName=Optional.of("chatlistener");
@@ -125,19 +128,23 @@ ITargetedEntitySkill {
 		@EventHandler
         public void chatListener(AsyncPlayerChatEvent e) {
         	boolean bl1=phrases.length==0;
+        	String s22=Utils.parseMobVariables(e.getMessage(),data,data.getCaster().getEntity(),p,null);
         	String s2=Utils.parseMobVariables(e.getMessage().toLowerCase(),data,data.getCaster().getEntity(),p,null);
         	Skill sk=null;
         	if(ChatListenerMechanic.this.radius.equals(
         			(double)Math.sqrt(Utils.distance3D(this.data.getCaster().getEntity().getBukkitEntity().getLocation().toVector(),
         			e.getPlayer().getLocation().toVector())))) {
         		for(int i1=0;i1<phrases.length;i1++) {
-        			if ((bl1=s2.contains(Utils.parseMobVariables(phrases[i1],data,data.getCaster().getEntity(),p,null)))) break;
+        			if ((bl1=s2.contains(Utils.parseMobVariables(phrases[i1],data,data.getCaster().getEntity(),p,null)))) {
+        				if (removephrase) s22=s22.replace(phrases[i1],"");
+        				break;
+        			}
         		}
         		if (bl1) {
+        			if (cancelMatch) e.setCancelled(true);
         			if (storage!=null) {
         				String s3=Utils.parseMobVariables(storage,data,data.getCaster().getEntity(),p,null);
-        				System.err.println(s3+":"+s2);
-        				data.getCaster().getEntity().getBukkitEntity().setMetadata(s3,new FixedMetadataValue(Main.getPlugin(),s2));
+        				data.getCaster().getEntity().getBukkitEntity().setMetadata(s3,new FixedMetadataValue(Main.getPlugin(),s22));
         			}
         			if (matchSkill.isPresent()) {
         				sk=matchSkill.get();
@@ -145,6 +152,7 @@ ITargetedEntitySkill {
         			}
     				if (breakOnMatch) this.terminate();
         		} else {
+        			if (cancelFalse) e.setCancelled(true);
         			if (falseSkill.isPresent()) {
         				sk=falseSkill.get();
         				sk.execute(data.deepClone());

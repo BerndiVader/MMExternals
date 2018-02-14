@@ -22,6 +22,9 @@ Use this skill to listen to the targeted players chat for period of ticks. If on
 + falseskill: executed if false.
 + multi: true/false(default) if more then 1 player is able to talk simultaneously.
 + meta: the metatag name where the message should be stored. ex: `meta=<trigger.uuid>lastmessage`this set a metatag for the mob with the triggers uuid + lastmessage. the value of the tag is the message.
++ removephrase: true/false(default) if the matched phrase should be removed from the message.
++ cancelmatch: true/false/default) cancel the message event if matched.
++ cancelfalse: true/false(default) cancel the message event if no match.
 
 Examples:
 
