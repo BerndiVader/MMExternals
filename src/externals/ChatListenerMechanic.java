@@ -35,6 +35,7 @@ ITargetedEntitySkill {
 	static String str;
 	int period;
 	boolean cancel,breakOnMatch,breakOnFalse,multi;
+	String storage;
 	String[]phrases;
 	RangedDouble radius;
 	Optional<Skill>matchSkill=Optional.empty();
@@ -58,11 +59,11 @@ ITargetedEntitySkill {
 		breakOnMatch=mlc.getBoolean("breakonmatch",true);
 		breakOnFalse=mlc.getBoolean("breakonfalse",false);
 		multi=mlc.getBoolean("multi",false);
+		storage=mlc.getString("meta",null);
 		this.buffName=Optional.of("chatlistener");
 		if ((s1=mlc.getString("matchskill"))!=null) matchSkill=Utils.mythicmobs.getSkillManager().getSkill(s1);
 		if ((s1=mlc.getString("falseskill"))!=null) falseSkill=Utils.mythicmobs.getSkillManager().getSkill(s1);
 		if ((s1=mlc.getString("inuseskill"))!=null) inuseSkill=Utils.mythicmobs.getSkillManager().getSkill(s1);
-		
 	}
 
 	@Override
@@ -121,7 +122,7 @@ ITargetedEntitySkill {
             }
         }
         
-        @EventHandler
+		@EventHandler
         public void chatListener(AsyncPlayerChatEvent e) {
         	boolean bl1=phrases.length==0;
         	String s2=Utils.parseMobVariables(e.getMessage().toLowerCase(),data,data.getCaster().getEntity(),p,null);
@@ -130,9 +131,14 @@ ITargetedEntitySkill {
         			(double)Math.sqrt(Utils.distance3D(this.data.getCaster().getEntity().getBukkitEntity().getLocation().toVector(),
         			e.getPlayer().getLocation().toVector())))) {
         		for(int i1=0;i1<phrases.length;i1++) {
-        			if ((bl1=s2.contains(phrases[i1]))) break;
+        			if ((bl1=s2.contains(Utils.parseMobVariables(phrases[i1],data,data.getCaster().getEntity(),p,null)))) break;
         		}
         		if (bl1) {
+        			if (storage!=null) {
+        				String s3=Utils.parseMobVariables(storage,data,data.getCaster().getEntity(),p,null);
+        				System.err.println(s3+":"+s2);
+        				data.getCaster().getEntity().getBukkitEntity().setMetadata(s3,new FixedMetadataValue(Main.getPlugin(),s2));
+        			}
         			if (matchSkill.isPresent()) {
         				sk=matchSkill.get();
         				sk.execute(data.deepClone());
