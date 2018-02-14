@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import com.gmail.berndivader.mythicmobsext.Main;
 import com.gmail.berndivader.mythicmobsext.externals.SkillAnnotation;
@@ -22,6 +23,7 @@ import io.lumine.xikage.mythicmobs.skills.IParentSkill;
 import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
 import io.lumine.xikage.mythicmobs.skills.Skill;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.xikage.mythicmobs.skills.SkillString;
 import io.lumine.xikage.mythicmobs.util.types.RangedDouble;
 
 @SkillAnnotation(name="chatlistener",author="BerndiVader")
@@ -30,24 +32,33 @@ extends
 BuffMechanic
 implements
 ITargetedEntitySkill {
+	static String str;
 	int period;
-	boolean cancel,breakOnMatch,breakOnFalse;
+	boolean cancel,breakOnMatch,breakOnFalse,multi;
 	String[]phrases;
 	RangedDouble radius;
 	Optional<Skill>matchSkill=Optional.empty();
 	Optional<Skill>falseSkill=Optional.empty();
 	Optional<Skill>inuseSkill=Optional.empty();
 	
+	static {
+		str="MME_CHATLISTENER";
+	}
+	
 	public ChatListenerMechanic(String skill, MythicLineConfig mlc) {
 		super(skill, mlc);
 		this.ASYNC_SAFE=false;
-		phrases=mlc.getString("phrases","").toLowerCase().split(",");
+		String s1=mlc.getString("phrases","").toLowerCase();
+		if (s1.startsWith("\"")&&s1.endsWith("\"")){
+			s1=s1.substring(1,s1.length()-1);
+		}
+		phrases=SkillString.parseMessageSpecialChars(s1).split(",");
 		period=mlc.getInteger("period",60);
 		radius=new RangedDouble(mlc.getString("radius","<10"));
 		breakOnMatch=mlc.getBoolean("breakonmatch",true);
 		breakOnFalse=mlc.getBoolean("breakonfalse",false);
+		multi=mlc.getBoolean("multi",false);
 		this.buffName=Optional.of("chatlistener");
-		String s1;
 		if ((s1=mlc.getString("matchskill"))!=null) matchSkill=Utils.mythicmobs.getSkillManager().getSkill(s1);
 		if ((s1=mlc.getString("falseskill"))!=null) falseSkill=Utils.mythicmobs.getSkillManager().getSkill(s1);
 		if ((s1=mlc.getString("inuseskill"))!=null) inuseSkill=Utils.mythicmobs.getSkillManager().getSkill(s1);
@@ -57,9 +68,9 @@ ITargetedEntitySkill {
 	@Override
 	public boolean castAtEntity(SkillMetadata arg0, AbstractEntity arg1) {
 		if (!arg1.isPlayer()) return false;
-		if (!arg0.getCaster().hasBuff(this.buffName.get())) {
+		if ((multi&&!arg1.getBukkitEntity().hasMetadata(str))||(!multi&&!arg0.getCaster().hasBuff(buffName.get()))) {
 			try {
-				BuffTracker ff=new ChatListener(this,arg0,(Player)arg1.getBukkitEntity());
+				BuffTracker ff=new ChatListener(this,arg0,arg1);
 				Field f=ff.getClass().getSuperclass().getDeclaredField("task");
 				f.setAccessible(true);
 				((ChatListener)ff).task1=(Task)f.get(ff);
@@ -87,17 +98,18 @@ ITargetedEntitySkill {
         Scheduler.Task task1;        
         int ticksRemaining;
         boolean hasEnded;
-        Player chatter;
+        AbstractEntity p;
         
-		public ChatListener(ChatListenerMechanic buff,SkillMetadata data,Player p) {
+		public ChatListener(ChatListenerMechanic buff,SkillMetadata data,AbstractEntity p) {
 			super(data);
 			this.buff=buff;
 			this.data=data;
             this.ticksRemaining=buff.period;
 			this.data.setCallingEvent(this);
 			this.hasEnded=false;
-			this.chatter=p;
+			this.p=p;
 			Main.pluginmanager.registerEvents(this,Main.getPlugin());
+			p.getBukkitEntity().setMetadata(str,new FixedMetadataValue(Main.getPlugin(),true));
 			this.start();
 		}
 		
@@ -112,7 +124,7 @@ ITargetedEntitySkill {
         @EventHandler
         public void chatListener(AsyncPlayerChatEvent e) {
         	boolean bl1=phrases.length==0;
-        	String s2=e.getMessage().toLowerCase();
+        	String s2=Utils.parseMobVariables(e.getMessage().toLowerCase(),data,data.getCaster().getEntity(),p,null);
         	Skill sk=null;
         	if(ChatListenerMechanic.this.radius.equals(
         			(double)Math.sqrt(Utils.distance3D(this.data.getCaster().getEntity().getBukkitEntity().getLocation().toVector(),
@@ -155,6 +167,7 @@ ITargetedEntitySkill {
                 this.hasEnded = true;
             }
         	HandlerList.unregisterAll(this);
+        	if (((Player)p.getBukkitEntity()).isOnline()) p.getBukkitEntity().removeMetadata(str,Main.getPlugin());
         	return task1.terminate();
         }
 	}
