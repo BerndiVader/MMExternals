@@ -13,13 +13,13 @@ import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.conditions.ILocationCondition;
 
 @ConditionAnnotation(name="otgbiome",author="BerndiVader / DragonsAscent")
-public class OpenTerrainBiomeCondition 
+public class OpenTerrainGeneratorCondition 
 extends
 AbstractCustomCondition
 implements
 ILocationCondition {
 	String[]biomes;
-	public OpenTerrainBiomeCondition(String line, MythicLineConfig mlc) {
+	public OpenTerrainGeneratorCondition(String line, MythicLineConfig mlc) {
 		super(line, mlc);
 		biomes=mlc.getString("biomes","").toLowerCase().split(",");
 	}
@@ -43,7 +43,7 @@ ILocationCondition {
 	String getBiome(Location l) {
 		String s1=null;
 		if (Main.pluginmanager.isPluginEnabled("OpenTerrainGenerator")) {
-			s1=OTG.getBiomeName(l.getWorld().getName(),l.getBlockX(),l.getBlockZ()).toLowerCase();
+			s1=OTG.getWorld(l.getWorld().getName()).getBiome(l.getBlockX(),l.getBlockZ()).getName().toLowerCase();
 		}
 		return s1;
 	}
