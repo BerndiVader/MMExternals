@@ -12,6 +12,7 @@ import com.pg85.otg.OTG;
 import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
+import io.lumine.xikage.mythicmobs.skills.SkillString;
 import io.lumine.xikage.mythicmobs.skills.conditions.ILocationCondition;
 
 @ConditionAnnotation(name="otgbiome",author="BerndiVader / DragonsAscent")
@@ -24,7 +25,11 @@ ILocationCondition {
 	boolean debug;
 	public OpenTerrainGeneratorCondition(String line, MythicLineConfig mlc) {
 		super(line, mlc);
-		biomes=mlc.getString("biomes","").toLowerCase().split(",");
+		String s1=SkillString.parseMessageSpecialChars(mlc.getString("biomes","").toLowerCase());
+		if (s1.startsWith("\"")&&s1.endsWith("\"")) {
+			s1=s1.substring(1,s1.length()-1);
+		}
+		biomes=s1.split(",");
 		debug=mlc.getBoolean("debug",false);
 	}
 
