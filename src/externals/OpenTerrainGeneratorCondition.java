@@ -5,6 +5,8 @@ import org.bukkit.Location;
 import com.gmail.berndivader.mythicmobsext.Main;
 import com.gmail.berndivader.mythicmobsext.conditions.AbstractCustomCondition;
 import com.gmail.berndivader.mythicmobsext.externals.ConditionAnnotation;
+import com.pg85.otg.LocalBiome;
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 
 import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
@@ -19,9 +21,11 @@ AbstractCustomCondition
 implements
 ILocationCondition {
 	String[]biomes;
+	boolean debug;
 	public OpenTerrainGeneratorCondition(String line, MythicLineConfig mlc) {
 		super(line, mlc);
 		biomes=mlc.getString("biomes","").toLowerCase().split(",");
+		debug=mlc.getBoolean("debug",false);
 	}
 
 	@Override
@@ -29,6 +33,7 @@ ILocationCondition {
 		String s1=null;
 		s1=getBiome(BukkitAdapter.adapt(var1));
 		boolean bl1=false;
+		if (debug) System.out.println("OTGBiome: "+s1);
 		if (s1!=null) {
 			for(int i1=0;i1<biomes.length;i1++) {
 				if(biomes[i1].equals(s1)) {
@@ -43,8 +48,11 @@ ILocationCondition {
 	String getBiome(Location l) {
 		String s1=null;
 		if (Main.pluginmanager.isPluginEnabled("OpenTerrainGenerator")) {
-			s1=OTG.getWorld(l.getWorld().getName()).getBiome(l.getBlockX(),l.getBlockZ()).getName().toLowerCase();
-		}
+			LocalBiome lb=null;
+			LocalWorld lw;
+			if ((lw=OTG.getWorld(l.getWorld().getName()))!=null&&(lb=lw.getBiomeById(lw.getBiomeGenerator().getBiome(l.getBlockX(),l.getBlockZ())))!=null) {
+				s1=lb.getName().toLowerCase();
+			}		}
 		return s1;
 	}
 
