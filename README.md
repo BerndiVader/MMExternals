@@ -82,3 +82,13 @@ inuse:
 `otcbiome{biomes=[STRING]||[ARRAY];action=[BOOL]||[CAST]||[CASTINSTEAD]}`
 
 **Requires [OpenTerrainControl](https://github.com/bloodmc/TerrainControl)**
+
+
+## otgbiome
+[file](https://github.com/BerndiVader/MMExternals/blob/master/externals/OTGBiomeCondition.jar)
+### Condition
+
+`otcbiome{biomes="[STRING]"||"[ARRAY]";action=[BOOL]||[CAST]||[CASTINSTEAD]}`
+
+**Requires [OpenTerrainGenerator](https://github.com/PG85/OpenTerrainGenerator)**
+
