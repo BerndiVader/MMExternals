@@ -19,9 +19,11 @@ AbstractCustomCondition
 implements
 ILocationCondition {
 	String[]biomes;
+	boolean like;
 	public OpenTerrainBiomeCondition(String line, MythicLineConfig mlc) {
 		super(line, mlc);
 		biomes=mlc.getString("biomes","").toLowerCase().split(",");
+		like=mlc.getBoolean("like",false);
 	}
 
 	@Override
@@ -31,10 +33,7 @@ ILocationCondition {
 		boolean bl1=false;
 		if (s1!=null) {
 			for(int i1=0;i1<biomes.length;i1++) {
-				if(biomes[i1].equals(s1)) {
-					bl1=true;
-					break;
-				}
+				bl1=like?biomes[i1].contains(s1):biomes[i1].equals(s1);
 			}
 		}
 		return bl1;

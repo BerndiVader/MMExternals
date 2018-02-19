@@ -79,7 +79,7 @@ inuse:
 [file](https://github.com/BerndiVader/MMExternals/blob/master/externals/OpenTerrainBiomeCondition.jar)
 ### Condition
 
-`otcbiome{biomes=[STRING]||[ARRAY];action=[BOOL]||[CAST]||[CASTINSTEAD]}`
+`otcbiome{biomes=[STRING]||[ARRAY];like=[BOOL];action=[BOOL]||[CAST]||[CASTINSTEAD]}`
 
 **Requires [OpenTerrainControl](https://github.com/bloodmc/TerrainControl)**
 
@@ -88,7 +88,42 @@ inuse:
 [file](https://github.com/BerndiVader/MMExternals/blob/master/externals/OTGBiomeCondition.jar)
 ### Condition
 
-`otcbiome{biomes="[STRING]"||"[ARRAY]";action=[BOOL]||[CAST]||[CASTINSTEAD]}`
+`otcbiome{biomes="[STRING]"||"[ARRAY]";like=[BOOL];action=[BOOL]||[CAST]||[CASTINSTEAD]}`
 
 **Requires [OpenTerrainGenerator](https://github.com/PG85/OpenTerrainGenerator)**
 
+Options:
+- biomes: use the biome names single or as array. If you need space use "" ex: `biomes="a biome,another biome"`
+- like: true/false(default) if the biome name need to match strict or like.
+
+
+## otgbiometemperature
+[file](https://github.com/BerndiVader/MMExternals/blob/master/externals/OpenTerrainGeneratorConditions.jar)
+### Condition
+
+`otgbiometemperature{range=[RANGEDVALUE];debug=[BOOL];action=[BOOL]||[CAST]||[CASTINSTEAD]}`
+
+**Requires [OpenTerrainGenerator](https://github.com/PG85/OpenTerrainGenerator)**
+
+Options:
+- range: use a ranged value like 1to5 or <0 ex: `range=>0`
+
+
+## otgbase
+[file](https://github.com/BerndiVader/MMExternals/blob/master/externals/OpenTerrainGeneratorConditions.jar)
+### Condition
+
+`otgbase{base=[STRING];range=[RANGEDVALUE];debug=[BOOL];action=[BOOL]||[CAST]||[CASTINSTEAD]}`
+
+**Requires [OpenTerrainGenerator](https://github.com/PG85/OpenTerrainGenerator)**
+
+Options:
+- range: use a ranged value like 1to5 or <0 ex: `range=>0`
+- base: the base value to compare:
+  - temperature: the base temperature.
+  - wetness: biomes wetness.
+  - isleinbiome: amount of islands in biome.
+  - volatility: volatility of biome.
+  - color: biomes color.
+  - rarity: rarity of biome.
+  - size: size of biome.
