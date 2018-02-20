@@ -4,6 +4,24 @@ How to use? Grab the modules you need from [externals](https://github.com/Berndi
 
 ### Externals so far:
 
+## clicklistener
+[file](https://github.com/BerndiVader/MMExternals/blob/master/externals/ClickListenerMechanic.jar)
+### Mechanic
+
+`clicklistener{maxdelay=[VALUE];actionbar=[BOOL];meta=[STRING];startskill=[SKILL];clickskill=[SKILL];finishskill=[SKILL];failskill=[SKILL]} @PLAYERTARGETERS`
+
+Use this mechanic to log the players left + right clicks. The player need to finish the listener with crouch. If the player dont click inside the maxdelay the
+listener execute failskill. After a click, the maxdelay is set back. The result string is stored into meta. Default metaname is "actionstring".
+
++ maxdelay: the max time in ticks between the clicks. set back to maxdelay after each click.
++ actionbar: true/false(default) the clicks should be shown in actionbar.
++ meta: the metatag where the clickstring is stored. default tag is "actionstring".
++ startskill: skill executed at start of the listener.
++ clickskill: skill for each click.
++ finishskill: skill executed after crouch is pressed.
++ failskill: skill if maxdealay ran out without crouch beeing used.
+
+
 ## chatlistener
 [file](https://github.com/BerndiVader/MMExternals/blob/master/externals/ChatListenerMechanic.jar)
 ### Mechanic

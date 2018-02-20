@@ -3,7 +3,6 @@ package externals;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -181,7 +180,7 @@ ITargetedEntitySkill {
                 this.hasEnded = true;
             }
         	HandlerList.unregisterAll(this);
-        	if (((Player)p.getBukkitEntity()).isOnline()) p.getBukkitEntity().removeMetadata(str,Main.getPlugin());
+        	p.getBukkitEntity().removeMetadata(str,Main.getPlugin());
         	return task1.terminate();
         }
 	}
